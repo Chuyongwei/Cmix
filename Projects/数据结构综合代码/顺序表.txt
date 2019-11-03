@@ -1,0 +1,150 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define LIST_INIT_SIZE 100
+#define LISTNCTRMENT 10
+typedef struct
+{
+	int *elem;
+	int length;
+	int listsize;
+}SqList;
+
+void InitList( SqList &L )
+{
+	L.elem = ( int *)malloc( LIST_INIT_SIZE*sizeof( int ) );
+	if( !L.elem )
+		return;
+	L.length = 0;
+	L.listsize = LIST_INIT_SIZE;
+	return; 
+}
+
+void input( SqList &L )
+{
+	int x,i = 0;
+	scanf( "%d",&x );
+	while( x )
+	{
+		L.elem[i] = x;;
+		scanf( "%d",&x );
+		i ++;
+	}
+	L.length = i;
+}
+void serach( SqList L , int &n )
+{
+	int i;
+	for( i = 0 ; i < L.length ; i ++ )
+		if ( L.elem[i] == n )
+		{
+			printf( "it get a num:%d\n",n );
+			return;
+		}
+	printf( "you can't find it\n" );
+}
+
+void Initsert( SqList &L,int i,int &n )
+{
+	int *q,*p,*newbase;
+	if ( i < 1 || i > L.length +1 )
+		return;
+	if ( L.length >= L.listsize )
+	{
+		newbase = ( int *)realloc( L.elem,( L.listsize + LISTNCTRMENT ) * sizeof( int ) );
+	if ( !newbase )
+		exit( 0 );
+	L.elem = newbase;
+	L.listsize += LISTNCTRMENT;
+	}
+	q = &( L.elem[i - 1] );
+    for( p = &( L.elem[ L.length - 1 ]); p >= q; --p )
+		*( p + 1 ) = *p;
+	*q = n;
+	++L.length;
+	return;
+}
+    
+void Delete( SqList &L,int i,int &n )
+{
+	int *q,*p;
+	if ( i < 1 || i > L.length )
+		return;
+	p = &( L.elem[ i - 1 ] );
+	n = *p;
+	q = L.elem + L.length - 1;
+	for ( ++p; p <= q; ++p )
+		*( p - 1 ) = *p;
+	--L.length;
+	return;
+}
+
+void hebing( SqList &L1,SqList &L2,SqList &L3 )
+{
+	int *p,*q,*p3;
+	int i,j;
+	int *pL,*qL;
+	p = L1.elem;
+	q = L2.elem;
+	L3.listsize = L3.length = L1.length + L2.length;
+    p3 = L3.elem = ( int* )malloc( L3.listsize * sizeof( int ) );
+    if( !L3.elem )
+		exit( 0 );
+	pL = L1.elem + L1.length - 1;
+	qL = L2.elem + L2.length - 1;
+    while( p <= pL && q <= qL )
+	{
+		if( *p <= *q )
+			*p3++ = *p++;
+		else
+			*p3++ = *q++;
+	}
+	while( p <= pL )
+		*p3++ = *p++;
+	while( q <= qL )
+		*p3++ =  *q++;
+}
+
+
+void output( SqList L )
+{
+	int i;
+	for( i = 0 ; i < L.length ; i ++ )
+		printf( "%d\t",L.elem[i] );
+	printf( "\n" );
+}
+
+int main()
+{
+	SqList l,L1,L2,L3;
+	int x,y,z;
+	int m;
+	/*InitList( l );
+	printf( "please int a list:\n" );
+	input( l );
+	output( l );
+	printf( "please input a num what you want:\n" );
+	scanf( "%d",&x );
+	serach( l,x );
+	printf( "please input a num what you want insert and the location:\n" );
+	scanf( "%d%d",&y,&z );
+    Initsert( l,y,z );
+	output( l );
+	printf( "please the num you want delete and the location:\n" );
+	scanf( "%d%d",&y,&m );
+	Delete( l,y,m );
+	output( l );*/
+	InitList( L1 );
+	printf( "please int a list:\n" );
+	input( L1 );
+	output( L1 );
+	InitList( L2 );
+	printf( "please int a list:\n" );
+	input( L2 );
+	output( L2 );
+	hebing( L1,L2,L3);
+	output( L3 );
+	return 0;
+}
+    
+
+

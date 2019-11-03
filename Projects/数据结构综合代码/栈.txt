@@ -1,0 +1,112 @@
+//栈的基本操作
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define Size 100
+#define Plus 10
+
+typedef struct 
+{
+	int *base;
+	int *top;
+	int stacksize;
+}SqStack;
+
+void InitStack( SqStack &S )
+{
+	S.base = ( int* )malloc( Size * sizeof( int ) );
+	if( !S.base )
+		exit( 0 );
+	S.top = S.base;
+	S.stacksize = Size;
+	return;
+}
+
+void GetTop( SqStack S,int &e )
+{
+	if( S.top == S.base )
+	{
+		printf( "stack is empty!!!\n" );
+		return;
+	}
+	e = *S.top--;
+    	return;
+}
+
+void Push( SqStack &S,int e )
+{
+	if( S.top - S.base >= S.stacksize )
+	{
+		S.base = ( int* )realloc( S.base,( S.stacksize + Plus ) * sizeof( int ) );
+        		if( !S.base )
+			exit( 0 );
+		S.top = S.base + S.stacksize;
+		S.stacksize += Plus;
+	}
+	*S.top++ = e;
+	return;
+}
+
+void Pop( SqStack &S,int &e )
+{
+	if( S.top == S.base )
+	{
+		printf( "stack is empty!!!\n" );
+		return;
+	}
+	e = *--S.top;
+	return;
+}
+
+void Hex( SqStack S,int n,int m )
+{
+	int e;
+	while( n )
+	{
+		Push( S,n%m );
+		n /= m;
+	}
+	while( S.top != S.base )
+	{
+		Pop( S,e );
+		printf( "e = %d\n",e );
+	}
+}
+
+void Pipei( SqStack S,char a[],int n )
+{
+	int Length,i;
+	int e;
+     	Length = strlen( a );
+	for( i = 0 ; i < Length / 2 ; i++ )
+		Push( S,a[i] );
+	for( i = Length / 2 ; i < Length ; i ++ )
+	{
+		Pop( S,e );
+		if( e == '(' && a[i] != ')' || e == '{' && a[i] != '}' || e == '[' && a[i] != ']' )
+		{
+			printf( "bupipei!!!" );
+             			return;
+		}
+	 }
+	 printf( "duichen" );
+	 return;
+}
+
+int main()
+{
+	SqStack s;
+	//int x,y;
+	char a[Size];
+	//printf( "please int a num and the Hex you want:\n" );
+	//scanf( "%d%d",&x,&y );
+	printf( "please int a string:\n" );
+	gets( a );
+	InitStack( s );
+	Pipei( s,a,Size );
+	printf( "\n" );
+	//Hex( s,x,y );
+
+	return 0;
+}

@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct QNode
+{
+	int data;
+	strcut QNode *next;
+}QNode,*Queue;
+
+typedef struct
+{
+	Queue front;
+	Queue rear;
+}LinkQueue;
+
+void InitQueue( LinkQueue &Q )
+{
+	Q.front = Q.rear = ( Queue )malloc( sizeof( QNode ) );
+	if( !Q.front )
+		exit( 0 );
+	Q.front->next = NULL;
+	return;
+}
+
+void EnQueue( LinkQueue &Q,int e )
+{
+	Queue p;
+	p = ( Queue)malloc( sizeof( QNode ) );
+	if( !p )
+		exit( 0 );
+	p->data = e;
+	p->next = NULL;
+	Q.rear->next = p;
+	Q.rear = p;
+	return;
+}
+
+void DeQueue( LinkQueue &Q,int &e )
+{
+	Queue p;
+	if( Q.front == Q.rear )
+		exit( 0 );
+	p = Q.front->next;
+	e = p->data;
+	Q.front->next = p->next;
+	if( Q.rear == p )
+		Q.rear = Q.front;
+	free( p );
+	return;
+}

@@ -1,0 +1,61 @@
+#include<iostream>
+using namespace std;
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+#include<vector>
+const int maxn = 2e5;
+int a[maxn];
+struct Data{
+	int l,r,sum;
+};
+Data T[maxn*15];
+int cnt = 0;//现在线段树中一共构建了几个节点
+vector<int> v;
+int get(int x)//获取x的离散化之后的值
+{
+	return lower_bound(v.begin(),v.end(),x)-v.begin()+1;
+}
+void insert(int l,int r,int &now,int pre,int x){
+	++cnt;now = cnt;
+	T[now] = T[pre];//当前线段树由前一个线段树得到
+	T[now].sum += 1;
+	if(l==r)	return;
+	int mid = (l+r)/2;
+	if(mid>=x)
+		insert(l,mid,T[now].l,T[pre].l,x);
+	else
+		insert(mid+1,r,T[now].r,T[pre].r,x);			
+}
+int query(int l,int r,int x,int y,int k){
+	if(l==r)
+		return l;
+	int mid = (l+r)/2;
+	int R_sum = T[T[y].r].sum - T[T[x].r].sum;
+	if(k<=R_sum)
+		query(mid+1,r,T[x].r,T[y].r,k);
+	else
+		query(l,mid,T[x].l,T[y].l,k-R_sum);
+}
+int root[maxn];
+int main(){
+	int n;
+	scanf("%d",&n);
+	for(int i=0;i<n;i++)
+		scanf("%d",&a[i]);
+	for(int i=0;i<n;i++)
+		v.push_back(a[i]);
+	sort(v.begin(),v.end());
+	v.erase(unique(v.begin(),v.end()),v.end());
+	for(int i=0;i<n;i++)
+		insert(1,v.size(),root[i+1],root[i],get(a[i]));
+	int m;
+	scanf("%d",&m);
+	for(int i=0;i<m;i++){
+		int l,r,k;
+		scanf("%d%d%d",&l,&r,&k);
+		int ans = query(1,v.size(),root[l],root[r+1],k);
+		printf("%d\n",v[ans-1]);
+	}	
+	return 0;
+}

@@ -1,0 +1,238 @@
+#include stdio.h
+#include iostream
+#include stack
+#include queue
+#include string.h
+#include stdlib.h
+#define MAX 20
+using namespace std;
+
+int visited[MAX];
+
+typedef struct ArcNode{
+	int adjvex;
+	struct ArcNode nextarc;
+}ArcNode,pArcNode; 
+
+typedef struct VNode{
+	char data;
+	ArcNode firstarc;	
+}VNode,AdjList[MAX];
+
+typedef struct{
+	AdjList vertices;
+	int vexnum,arcnum;
+}ALGraph;
+
+int LocateVex(ALGraph G,char e)
+{
+	int i;
+	
+	for(i=0;iG.vexnum;i++)
+	{
+		if(G.vertices[i].data==e)
+			return i;
+	}
+	
+	return -1;
+}
+
+void CreatAdList(ALGraph &G)
+{根据输入的有向图G的顶点数及边数，建立图G的邻接表
+	int i,j,k;
+	char v1,v2;
+	ArcNode s,p;
+	
+	scanf(%d%d,&G.vexnum,&G.arcnum);输入点数和边数 
+	getchar();
+	for(i=0;iG.vexnum;i++) 初始化头结点 
+	{
+		scanf(%c,&G.vertices[i].data);
+		getchar();
+		G.vertices[i].firstarc=NULL;
+	}
+	for(k=0;kG.arcnum;k++)
+	{
+		scanf(%c %c,&v1,&v2);
+		getchar();
+		i=LocateVex(G,v1);
+		j=LocateVex(G,v2);
+		s= (ArcNode )malloc(sizeof(ArcNode));
+		s-adjvex=j;
+		s-nextarc=NULL;
+		p=G.vertices[i].firstarc;
+		if(!p)
+		{
+			G.vertices[i].firstarc = s;把它与头结点连上关系 
+		}
+		else
+		{
+			while(p-nextarc)
+				p=p-nextarc;
+			p-nextarc=s;
+		}
+	}
+}CreateAdiMatrix
+
+int First(ALGraph G,int i)
+{First是用来找到与这个顶点相连的第一个点的编号
+如果没有则返回-1
+	while(G.vertices[i].firstarc)
+	{
+		return G.vertices[i].firstarc-adjvex;
+	}
+	
+	return -1;
+}
+
+int Next(ALGraph G,int i,int j)
+{Next是用来找到与这个顶点相连的下一个点的编号
+如果没有则返回-1 
+	ArcNode p;
+	p=G.vertices[i].firstarc;
+	while(p&&p-adjvex!=j)
+	{
+		p=p-nextarc;
+	}
+	if(p-nextarc)
+	{
+		return p-nextarc-adjvex;
+	}
+	
+	return -1;
+}
+
+void dfs(ALGraph G,int v)
+{dfs递归 
+	int i,j;
+	
+	visited[v]=1;标记，此时代表已访问 
+	printf(%c ,G.vertices[v].data);输出一下访问结果 
+	i=LocateVex(G,G.vertices[v].data);找到这个顶点所对应的编号 
+	for(j=First(G,i);j=0;j=Next(G,i,j))First是用来找到与这个顶点相连的第一个点的编号 
+	{									Next是用来找到与这个顶点相连的下一个点的编号
+		if(!visited[j])
+			dfs(G,j);
+	}
+}
+
+void DFSTraverse(ALGraph G)
+{
+	int i;
+	
+	for(i=0;iG.vexnum;i++)
+	{
+		visited[i]=0;把visited初始化为0，表示未访问 
+	}
+	for(i=0;iG.vexnum;i++)
+	{
+		if(!visited[i])
+		{
+			dfs(G,i);没访问的，对其进行dfs深度搜索遍历 
+		}
+	}
+}
+
+void BFSTraverse(ALGraph G)
+{对图G作广度优先遍历
+	int v,u,w;
+	char v1,v2;
+	ArcNode s,p;
+	queueint Q;
+	
+	for(v=0;vG.vexnum;v++)
+	{
+	 	visited[v]=0;
+	}
+	for(v=0;vG.vexnum;v++)
+	{
+		if(!visited[v])
+		{
+			visited[v]=1;
+			printf(%c ,G.vertices[v].data);
+			Q.push(v);
+			while(!Q.empty())
+			{
+				u=Q.front();
+				Q.pop();	
+				for(w=First(G,u);w=0;w=Next(G,u,w))
+				{
+					if(!visited[w])
+					{
+						visited[w]=1;
+						printf(%c ,G.vertices[w].data);
+						Q.push(w);
+					}
+				}
+			}
+		}
+	}
+	
+}
+
+void dfs_non(ALGraph G,int v)
+{从第v个顶点出发深度优先遍历图G 
+	int w;
+	pArcNode p;
+	
+	stackpArcNode  S;
+	
+	visited[v]=1;
+	printf(%c ,G.vertices[v].data);输出第v个顶点 
+	p=G.vertices[v].firstarc;
+	while(p  !S.empty())
+	{
+		while(p)
+		{
+			if(visited[p-adjvex])
+				p=p-nextarc;
+			else
+			{
+				printf(%c ,G.vertices[p-adjvex].data);
+				visited[p-adjvex]=1;
+				S.push(p);
+				p=G.vertices[p-adjvex].firstarc;
+			}
+		}
+		if(!S.empty())
+		{
+			p=S.top();
+			S.pop();
+			p=p-nextarc;
+		}
+	}
+}
+
+void DFSTraverse_non(ALGraph G)
+{
+	int i;
+	
+	for(i=0;iG.vexnum;i++)
+	{
+		visited[i]=0;把visited初始化为0，表示未访问 
+	}
+	for(i=0;iG.vexnum;i++)
+	{
+		if(!visited[i])
+		{
+			dfs_non(G,i);没访问的，对其进行dfs深度搜索遍历 
+		}
+	}
+}
+
+int main()
+{
+	ALGraph G;
+	
+	CreatAdList(G);创建邻接表
+	printf(dfs of recursionn) ;
+	DFSTraverse(G);进行dfs递归搜索 
+	printf(n);
+	printf(dfs of non-recursionn);
+	DFSTraverse_non(G);dfs非递归 
+	printf(n);
+	BFSTraverse(G);就行广度非递归搜索,非递归
+	
+	
+	return 0;
+}

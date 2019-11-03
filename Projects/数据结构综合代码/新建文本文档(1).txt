@@ -1,0 +1,69 @@
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#include<math.h>
+#define MAXSIZE 20
+typedef struct{
+    int key;
+    int data;
+}NodeType;
+
+typedef NodeType SeqList[MAXSIZE];
+
+void Init(SeqList &Q,int &m,int &n){
+    if(m>MAXSIZE||m<0)
+        printf("Error\n"); 
+    else{
+    	printf("输入一组元素:\n");
+		for(int i=0;i<m;i++)
+    		scanf("%d",&Q[i].key);
+	}  	
+    printf("\n");
+    printf("请输入要查找的数据:\n");
+    scanf("%d",&n);
+}
+
+void BlockSearch(SeqList S,int m,int n){
+    int len,b,num,i,j;
+    bool flag=0;
+    len=sqrt(m);
+    b=m%len==0?0:1;
+    num=m/len+b;      //分的组数
+    printf("分的组数为%d\n",num);
+    for(i=0;i<num;i++){
+    	int NUM=(i*num+num)<=m?(i*num+num):m;
+		if(n<S[NUM].key){
+ 	        for(j=i*num;j<(NUM)&&n!=S[j].key;j++){
+			    if(j<NUM){
+                	printf("1.分块查找次数为：%d\n",(i+j-i*num+1));
+                	flag=1;
+                	break;
+				}
+            	else{
+  					printf("数据不存在！\n");
+       				flag=1;
+  					break; 
+ 				}
+			}		
+        }
+        else if(n==S[NUM].key){
+			printf("2.分块查找次数为：%d\n",(i+1));
+			flag=1;
+ 			break; 
+		}
+ 	}
+    if(!flag)
+        printf("数据不存在！分块查找次数为：%d\n",(i+1));
+}
+
+
+
+int main(){
+    SeqList Q;
+    int m,n;
+    printf("请输入数组的长度："); 
+    scanf("%d",&m);
+    Init(Q,m,n);
+    BlockSearch(Q,m,n);
+    return 0;
+}

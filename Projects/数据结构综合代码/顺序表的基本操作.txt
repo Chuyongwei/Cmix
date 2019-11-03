@@ -1,0 +1,114 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<iostream>
+
+#define LIST_INIT_SIZE 100
+#define LISTINCREMENT 10
+
+typedef struct{
+	int *elem;						//存储空间基址 
+	int ListLength;					//当前长度，元素个数 
+	int ListSize;					//当前分配的存储容量 
+}SqList;
+
+void InitList(SqList *List,int iSize){
+	List->ListSize = iSize;
+//	List = new int[iSize];
+	List->elem=(int *)malloc(LIST_INIT_SIZE*sizeof(int));
+	List->ListLength = 0;
+}
+
+void DestroyList(SqList *List){
+	delete []List;
+	List = NULL;
+}
+
+void ClearList(SqList *List){
+	List->ListLength = 0;
+}
+
+bool ListEmpty(SqList *List){
+//	return List.ListLengh?true:false;
+	if(List->ListLength == 0)
+		return true;
+	return false;
+}
+
+int ListLength(SqList *List){
+	return List->ListLength;
+}
+
+void GetElem(SqList *List,int i,int *e){
+	if(i<0 || i>List->ListSize)
+		return;
+	*e = List->elem[i];
+}
+
+int LocateElem(SqList *List,int *e){
+	for(int i = 0;i<List->ListLength;i++)
+	{
+		if(List->elem[i] == *e)
+			return i;
+	}
+	return -1;
+}
+
+bool PriorElem(SqList *List,int *currentElem,int *preElem){
+	int temp = LocateElem(List,currentElem);
+	if(temp == -1)
+		return false;
+	if(temp == 0)
+		return false;
+	*preElem = List->elem[temp-1];
+	return true;
+}
+
+bool NextElem(SqList *List,int *currentElem,int *nextElem){
+	int temp = LocateElem(List,currentElem);
+	if(temp == -1)
+		return false;
+	if(temp == List->ListLength-1)
+		return false;
+	*nextElem = List->elem[temp+1];
+	return true;
+}
+
+void ListTraverse(SqList *List){
+	for(int i=0;i<List->ListLength;i++){
+		printf("%d ",&List[i]);
+	}
+}
+
+void ListInsert(SqList *List,int i,int *e){
+	if(i<0||i>List->ListLength)
+		return;
+	for(int k=List->ListLength-1;k>=i;k--){
+		List[k+1] = List[k];
+	}
+	List->elem[i] = *e;
+	List->ListLength++;
+}
+
+void ListDelete(SqList *List,int i,int *e){
+	if(i<0||i>=List->ListLength)
+		return;
+	*e = List->elem[i];
+	for(int k=i+1;k<List->ListLength;k++){
+		List[k-1] = List[k];
+	}
+	List->ListLength--;
+}
+
+int main(){
+	SqList *L;
+	InitList(L,3);
+	int a=1;
+	int b=2;
+	int c=3;
+	ListInsert(L,0,&a);
+	ListInsert(L,1,&b);
+	ListInsert(L,2,&c);
+	ListTraverse(L);
+	
+	return 0;
+}

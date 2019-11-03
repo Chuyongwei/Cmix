@@ -1,0 +1,348 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define Max 100
+#define Plus 10
+typedef struct
+{
+     int  vexnum, arcnum; //顶点数与边数	
+     int  vexs[Max];     
+     int arcs[Max][Max];                 	
+}MGraph,*MGpiont;
+
+typedef struct ArcNode
+{
+    int     adjvex;
+    struct  ArcNode   *nextarc;
+}ArcNode,*Arc;
+
+typedef struct VNode
+{
+    int       data;
+    ArcNode   *firstarc;
+}VNode, AdjList[Max];
+
+typedef  struct
+{
+      AdjList     vertices;
+      int       vexnum, arcnum;
+}ALGraph;
+
+typedef struct
+{
+	Arc *base;
+	int top;
+	int stacksize;
+}SqStack;
+
+int LocateM( MGraph &G,int v )
+{
+	int i;
+	for( i = 1 ; i <= G.vexnum ; i ++ )
+		if( G.vexs[i] == v )
+			return i;
+	return -1;
+}
+
+typedef struct
+{
+	int *base;
+	int  front;
+	int  rear;
+}LinkQueue;
+
+void visit( char e )
+{
+	printf( "%c\t",e );
+}
+void InitStack( SqStack &S )
+{
+	S.base = ( Arc* )malloc( Max * sizeof( Arc ) );
+	if( !S.base )
+		exit( 0 );
+ 	S.top = 0;
+	S.stacksize = Max;
+	return;
+}
+
+int StackEmpty( SqStack S )
+{
+	if( S.top == 0 )
+		return 1;
+    return 0;
+}
+
+void Push( SqStack &S,Arc e )
+{
+	if( S.top >= S.stacksize )
+	{
+		S.base = ( Arc* )realloc( S.base,( S.stacksize + Plus ) * sizeof( Arc ) );
+		if( !S.base )
+			exit( 0 );
+		S.stacksize += Plus;
+	}
+	S.base[ S.top++ ] = e;
+	return;
+}
+
+void Pop( SqStack &S,Arc &e )
+{
+	if( StackEmpty( S ) )
+		exit( 0 );
+	e = S.base[--S.top];
+	return;
+}
+
+void InitQueue( LinkQueue &Q )
+{
+	Q.base = ( int* )malloc( sizeof( int ) );
+	if( !Q.base )
+		exit( 0 );
+	Q.front = Q.rear = 0;
+	return;
+}
+
+void EnQueue( LinkQueue &Q,int e )
+{   
+	if( ( Q.rear + 1 ) % Max == Q.front )
+	{
+		printf( "It is error!!!\n" );
+		return;
+	}
+	Q.base[ Q.rear ] = e;
+	Q.rear = ( Q.rear + 1 ) % Max;
+	return;
+}
+
+void DeQueue( LinkQueue &Q,int &e )
+{
+	if( Q.front == Q.rear )
+		return;
+	e = Q.base[ Q.front ];
+	Q.front = ( Q.front + 1 ) % Max;
+	return;
+}
+
+int QueueEmpty( LinkQueue Q )
+{
+	if( Q.front == Q.rear )
+		return 1;
+	return 0;
+}
+
+void visitM( MGraph M,int v )
+{
+	printf( "%d\t",M.vexs[v] );
+}
+
+void visitG( ALGraph G,int v )
+{
+	printf( "%d\t",G.vertices[v].data );
+}
+
+int LocateG( ALGraph &G,int v )
+{
+	int i;
+	for( i = 1 ; i <= G.vexnum ; i ++ )
+		if( G.vertices[i].data == v )
+			return i;
+	return -1;
+}
+
+void CreateAdjMatrix( MGraph &M )
+{
+	int i,j,k;
+	int v1,v2;
+	printf( "please int the vexnum and arcnum:\n" );
+		scanf( "%d%d",&M.vexnum,&M.arcnum );
+	printf( "please int the xiangliang:\n" );
+	for( i = 1 ; i <= M.vexnum ; i ++ )
+		scanf( "%d",&M.vexs[i] );
+	printf( "please int the v1 and v2:\n" );
+	for( i = 1 ; i <= M.vexnum ; i++ )      
+        for(j = 1 ; j <= M.vexnum ; j++ )
+                M.arcs[i][j] = 0;
+	for( k = 1 ; k <= M.arcnum ; k++ )
+	{
+			 scanf( "%d%d",&v1,&v2 );
+			 i = LocateM( M,v1 );    
+			 j = LocateM( M,v2 ); 
+			 M.arcs[i][j] = M.arcs[j][i] = 1;
+	 }
+}
+ 
+void CreateAdjList( ALGraph &G )
+{
+	int i,j,k;
+	int v1,v2;
+	ArcNode *p,*s;
+	printf( "please int teh vex and arc:\n" );
+	scanf( "%d%d",&G.vexnum,&G.arcnum );
+    for( i = 1 ; i <= G.vexnum; i++ )   
+    {  
+		printf( "int the jiedian:\n" );
+		scanf( "%d",&G.vertices[i].data ); 
+		G.vertices[i].firstarc = NULL;  
+	}
+	printf( "int the zuobiao:\n" );
+    for( k = 1; k <= G.arcnum; k++ )
+	{    
+		  scanf( "%d%d",&v1,&v2 );
+		  i = LocateG( G , v1 );    
+		  j = LocateG( G , v2 );
+		  s = ( ArcNode *)malloc( sizeof( ArcNode ) );
+          s->adjvex = j; 
+		  s->nextarc = NULL;
+          p = G.vertices[i].firstarc;
+          if( !p )
+			  G.vertices[i].firstarc = s;
+          else 
+		  {  
+			  while( p->nextarc )  
+				p = p->nextarc;
+              p->nextarc = s;
+		  }
+    }
+}
+
+int FirstAdjVex( MGraph M,int v )
+{
+	int i;
+	for( i = 1 ; i <= M.vexnum ; i++ )
+		if( M.arcs[v][i] == 1 )
+			return i;
+		return -1;
+}
+
+int NextAdjVex( MGraph M,int v,int w )
+{
+	int i;
+	for( i = w + 1 ; i < M.vexnum ; i ++ )
+		if( M.arcs[v][i] == 1 )
+			return i;
+		return -1;
+}
+
+void DFSM( MGraph M,int v,int visited[],int n)
+{
+	int w;
+	visited[v] = 1;
+	visitM( M,v );
+	for( w = FirstAdjVex( M,v ) ; w >= 0 ; w = NextAdjVex( M,v,w) )
+		if( !visited[w] )
+			DFSM( M,w,visited,Max );
+}
+
+void DFSTraverseM( MGraph M )
+{
+	int v;
+	int visited[Max];
+	for( v = 1 ; v <= M.vexnum ; v ++ )
+		visited[v] = 0;
+	for( v = 0 ; v <= M.vexnum ; v ++ )
+		if( !visited[v] )
+			DFSM( M,v,visited,Max );
+}
+
+void DFSG( ALGraph G,int v,int visited[],int n)
+{
+	ArcNode *p;
+	visited[v] = 1;
+	visitG( G,v );
+	for( p = G.vertices[v].firstarc ; p != NULL ; p = p->nextarc )
+		if( !visited[G.vertices[v].data] )
+			DFSG( G,v,visited,Max );
+}
+
+void DFSTraverseG( ALGraph G )
+{
+	int v;
+	int visited[Max];
+	for( v = 1 ; v <= G.vexnum ; v ++ )
+		visited[v] = 0;
+	for( v = 0 ; v <= G.vexnum ; v ++ )
+		if( !visited[v] )
+			DFSG( G,v,visited,Max );
+}
+
+void DFS( ALGraph G )
+{//非递归
+	SqStack S;
+	ArcNode *p;
+	int v;
+	int visited[Max];
+	InitStack( S );
+	for( v = 1 ; v <= G.vexnum ; v ++ )
+		visited[v] = 0;
+	v = 1;
+	visited[v] = 1;
+	visitG( G,v );
+	p = G.vertices[v].firstarc;
+	while( p || !StackEmpty( S ) )
+	{
+		while( p )
+			if( visited[ p->adjvex ] )
+				p = p->nextarc;
+			else
+			{
+				visitG( G,p ->adjvex );
+				visited[p->adjvex] = 1;
+				Push( S,p );
+				p = G.vertices[ p->adjvex ].firstarc;
+			}
+		if( !StackEmpty( S ) )
+		{
+			Pop( S,p );
+			p = p->nextarc;
+		}
+	}
+}
+
+void BFSTraverse( MGraph M )
+{
+	int v,u,w;
+	int visited[Max];
+	LinkQueue Q;
+	for( v = 1 ; v <= M.vexnum ; v ++ )
+		visited[v] = 0;
+	InitQueue( Q );
+	for( v = 1 ; v <= M.vexnum ; v ++ )
+		if( !visited[v] )
+		{
+			visited[v] = 1;
+			visitM( M,v );
+			EnQueue( Q,v );
+			while( !QueueEmpty( Q ) )
+			{
+				DeQueue( Q,u );
+				for( w = FirstAdjVex( M,u ) ; w >= 0 ; w = NextAdjVex( M,u,w ) )
+					if( !visited[w] )
+					{
+						visited[w] = 1;
+						visitM( M,w );
+						EnQueue( Q,w );
+					}
+			}
+		}
+}
+
+int main()
+{
+	MGraph m;
+	ALGraph g;
+	CreateAdjList( g );
+	CreateAdjMatrix( m );
+	printf( "this is the digui 无向图:\n" );
+	DFSTraverseM( m );
+	printf( "\n" );
+	printf( "this is the digui 有向图:\n" );
+	DFSTraverseG( g );
+	printf( "\n" );
+	printf( "this is the DFS:\n" );
+	DFS( g );
+	printf( "\n" );
+	printf( "this is the BFS:\n" );
+	BFSTraverse( m );
+	printf( "\n" );
+	return 0;
+}

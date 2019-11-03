@@ -1,0 +1,49 @@
+#include<stdio.h>  
+#include<stdlib.h>
+#define N 5
+
+typedef struct PolynNode{  
+    int coef; 
+    int expn;
+    struct PolynNode *next;  
+}PolynNode;
+
+void CreatePolyn(PolynList &L,int n){  
+    int i;  
+    PolynList p,q;  
+    L=(PolynList)malloc(sizeof(PolynNode));   
+    L->next=NULL;  
+    q=L;  
+    printf("成对输入%d个数据\n",n);  
+    for(i=1;i<=n;i++){  
+        p=(PolynList)malloc(sizeof(PolynNode));  
+        scanf("%d%d",&p->coef,&p->expn);      
+        q->next=p;  
+        q=q->next;  
+    }  
+    p->next=NULL;  
+}
+
+void qiudao(PolynNode &L){
+	int a=0;
+	int *p;
+	int *q=p;
+	p=GetHead(L);
+	while(p&&a<N){
+		printf("%d*x^%d+",L.coef*L.expn,L.expn-1);
+		p=p->next;
+		a++;
+	}
+}
+
+int main(){
+	
+	PolynNode L;
+
+	CreatPolyn(L,N);
+	printf("导数为:\n");
+	qiudao(L);
+	printf("\n");
+
+	return 0;
+}  
